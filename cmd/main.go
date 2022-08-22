@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/joho/godotenv"
-	"github.com/labstack/gommon/log"
 	_ "github.com/lib/pq"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	todo "go-todo"
 	"go-todo/pkg/handler"
@@ -13,12 +13,13 @@ import (
 )
 
 func main() {
+	//logrus.SetFormatter(new(logrus.JSONFormatter))
 	if err := initConfig(); err != nil {
-		log.Fatalf("error while reading config: %s", err.Error())
+		logrus.Fatalf("error while reading config: %s", err.Error())
 	}
 
 	if err := godotenv.Load(); err != nil {
-		log.Fatalf("error while reading env: %s", err.Error())
+		logrus.Fatalf("error while reading env: %s", err.Error())
 	}
 
 	db, err := repository.NewPostgresDB(repository.Config{
@@ -30,7 +31,7 @@ func main() {
 		SSLMode:  viper.GetString("db.sslmode"),
 	})
 	if err != nil {
-		log.Fatalf("error while connection to db: %s", err.Error())
+		logrus.Fatalf("error while connection to db: %s", err.Error())
 	}
 
 	repos := repository.NewRepository(db)
@@ -38,7 +39,7 @@ func main() {
 	handlers := handler.NewHandler(services)
 	srv := new(todo.Server)
 	if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
-		log.Fatalf("error: %s", err.Error())
+		logrus.Fatalf("error: %s", err.Error())
 	}
 }
 func initConfig() error {
