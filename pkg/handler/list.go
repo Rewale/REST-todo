@@ -2,14 +2,32 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
+	todo "go-todo"
 	"net/http"
 )
 
 func (h *Handler) createList(c *gin.Context) {
-	id, _ := c.Get(userCtxKey)
+	userId, err := getUserId(c)
+	if err != nil {
+		return
+	}
+
+	var input todo.TodoList
+	if err := c.BindJSON(&input); err != nil {
+		NewErrorResponse(c, http.StatusUnprocessableEntity, err.Error())
+		return
+	}
+
+	id, err := h.service.TodoList.CreateList(userId, input)
+	if err != nil {
+		NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
 	c.JSON(http.StatusOK, map[string]any{
-		"id_user": id,
+		"id": id,
 	})
+
 }
 
 func (h *Handler) getAllLists(c *gin.Context) {
