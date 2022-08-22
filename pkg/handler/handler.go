@@ -20,6 +20,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	{
 		auth.POST("/sign-up", h.singUp)
 		auth.POST("/sign-in", h.singIn)
+		auth.GET("/check-jwt", h.CheckJWT)
 	}
 
 	api := router.Group("api")
