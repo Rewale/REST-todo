@@ -6,6 +6,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
 	todo "go-todo"
+	"strings"
 )
 
 type TodoPostgres struct {
@@ -79,11 +80,30 @@ func (r *TodoPostgres) DeleteListById(userId, listId int) error {
 	return nil
 }
 func (r *TodoPostgres) UpdateListById(userId int, listId int, input todo.UpdateListInput) error {
+	setValues := make([]string, 0)
+	args := make([]any, 0)
+	argId := 1
 
-	query := "UPDATE todo_lists as tl SET title=$1, description=$2 " +
+	if input.Title != nil {
+		setValues = append(setValues, fmt.Sprintf("title=$%d", argId))
+		args = append(args, *input.Title)
+		argId++
+	}
+
+	if input.Description != nil {
+		setValues = append(setValues, fmt.Sprintf("description=$%d", argId))
+		args = append(args, *input.Description)
+		argId++
+	}
+	setQuery := strings.Join(setValues, ", ")
+
+	query := "UPDATE todo_lists as tl SET " + setQuery + " " +
 		"FROM users_lists as ul " +
-		"WHERE ul.user_id=$3 and ul.list_id=tl.id and tl.id=$4"
-	result, err := r.db.Exec(query, input.Title, input.Description, userId, listId)
+		fmt.Sprintf("WHERE ul.user_id=$%d and ul.list_id=tl.id and tl.id=$%d", argId, argId+1)
+
+	args = append(args, userId, listId)
+
+	result, err := r.db.Exec(query, args...)
 	if err != nil {
 		return err
 	}
@@ -91,6 +111,5 @@ func (r *TodoPostgres) UpdateListById(userId int, listId int, input todo.UpdateL
 	if count, _ := result.RowsAffected(); count != 1 {
 		return errors.New("nothing to update")
 	}
-
 	return nil
 }
