@@ -27,7 +27,7 @@ func (s *AuthService) CreateUser(user todo.User) (int, error) {
 }
 
 type customClaims struct {
-	Username string `json:"username"`
+	UserId int `json:"user_id"`
 	jwt.StandardClaims
 }
 
@@ -39,7 +39,7 @@ func (s *AuthService) GenerateToken(username string, password string) (string, e
 	}
 
 	claims := customClaims{
-		Username: user.Username,
+		UserId: user.Id,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().UTC().Unix() + expressionTime,
 			Issuer:    "nameOfWebsiteHere",
@@ -56,7 +56,7 @@ func (s *AuthService) GenerateToken(username string, password string) (string, e
 	return signedToken, nil
 }
 
-func (s *AuthService) CheckToken(jwtToken string) (string, error) {
+func (s *AuthService) CheckToken(jwtToken string) (int, error) {
 	token, err := jwt.ParseWithClaims(
 		jwtToken,
 		&customClaims{},
@@ -66,18 +66,18 @@ func (s *AuthService) CheckToken(jwtToken string) (string, error) {
 	)
 
 	if err != nil {
-		return "", err
+		return 0, err
 	}
 
 	claims, ok := token.Claims.(*customClaims)
 	if !ok {
-		return "", errors.New("couldn't parse claims")
+		return 0, errors.New("couldn't parse claims")
 	}
 
 	if claims.ExpiresAt < time.Now().UTC().Unix() {
-		return "", errors.New("jwt is expired")
+		return 0, errors.New("jwt is expired")
 	}
-	return claims.Username, nil
+	return claims.UserId, nil
 }
 
 func generatePasswordHash(password string) string {

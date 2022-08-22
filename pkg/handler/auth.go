@@ -62,7 +62,7 @@ func (h *Handler) CheckJWT(c *gin.Context) {
 	}
 
 	c.JSON(200, map[string]any{
-		"username": username,
+		"id_user": username,
 	})
 
 }

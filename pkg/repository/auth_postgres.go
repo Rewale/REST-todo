@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"errors"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	todo "go-todo"
@@ -31,10 +30,6 @@ func (r *AuthPostgres) GetUser(username string, passwordHash string) (*todo.User
 		Password: passwordHash,
 	}
 	query := fmt.Sprintf("SELECT name, id  FROM %s WHERE password_hash=$1 and username=$2", userTable)
-	row := r.db.QueryRow(query, passwordHash, username)
-
-	if err := row.Scan(&user.Name, &user.Id); err != nil {
-		return nil, errors.New("Not found user " + username)
-	}
-	return &user, nil
+	err := r.db.Get(&user, query, passwordHash, username)
+	return &user, err
 }
