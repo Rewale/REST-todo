@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/labstack/gommon/log"
+	_ "github.com/lib/pq"
 	"github.com/spf13/viper"
 	todo "go-todo"
 	"go-todo/pkg/handler"
@@ -14,7 +15,19 @@ func main() {
 		log.Fatalf("error while reading config: %s", err.Error())
 	}
 
-	repos := repository.NewRepository()
+	db, err := repository.NewPostgresDB(repository.Config{
+		Host:     "localhost",
+		Post:     "5432",
+		Username: "wale1",
+		Password: "djeb126",
+		DBName:   "todo-go",
+		SSLMode:  "disable",
+	})
+	if err != nil {
+		log.Fatalf("error while connection to db: %s", err.Error())
+	}
+
+	repos := repository.NewRepository(db)
 	services := service.NewService(repos)
 	handlers := handler.NewHandler(services)
 	srv := new(todo.Server)
