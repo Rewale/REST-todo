@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/joho/godotenv"
 	"github.com/labstack/gommon/log"
 	_ "github.com/lib/pq"
 	"github.com/spf13/viper"
@@ -8,6 +9,7 @@ import (
 	"go-todo/pkg/handler"
 	"go-todo/pkg/repository"
 	"go-todo/pkg/service"
+	"os"
 )
 
 func main() {
@@ -15,13 +17,17 @@ func main() {
 		log.Fatalf("error while reading config: %s", err.Error())
 	}
 
+	if err := godotenv.Load(); err != nil {
+		log.Fatalf("error while reading env: %s", err.Error())
+	}
+
 	db, err := repository.NewPostgresDB(repository.Config{
-		Host:     "localhost",
-		Post:     "5432",
-		Username: "wale1",
-		Password: "djeb126",
-		DBName:   "todo-go",
-		SSLMode:  "disable",
+		Host:     viper.GetString("db.host"),
+		Port:     viper.GetString("db.port"),
+		Username: viper.GetString("db.username"),
+		Password: os.Getenv("DB_PASSWORD"),
+		DBName:   viper.GetString("db.dbname"),
+		SSLMode:  viper.GetString("db.sslmode"),
 	})
 	if err != nil {
 		log.Fatalf("error while connection to db: %s", err.Error())

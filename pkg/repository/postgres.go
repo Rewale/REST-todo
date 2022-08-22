@@ -7,7 +7,7 @@ import (
 
 type Config struct {
 	Host     string
-	Post     string
+	Port     string
 	Username string
 	Password string
 	DBName   string
@@ -16,7 +16,7 @@ type Config struct {
 
 func (c *Config) GetConnectionString() string {
 	return fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s",
-		c.Host, c.Post, c.Username, c.DBName, c.Password, c.SSLMode)
+		c.Host, c.Port, c.Username, c.DBName, c.Password, c.SSLMode)
 }
 
 func NewPostgresDB(cfg Config) (*sqlx.DB, error) {
