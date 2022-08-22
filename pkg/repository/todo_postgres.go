@@ -78,3 +78,19 @@ func (r *TodoPostgres) DeleteListById(userId, listId int) error {
 
 	return nil
 }
+func (r *TodoPostgres) UpdateListById(userId int, listId int, input todo.UpdateListInput) error {
+
+	query := "UPDATE todo_lists as tl SET title=$1, description=$2 " +
+		"FROM users_lists as ul " +
+		"WHERE ul.user_id=$3 and ul.list_id=tl.id and tl.id=$4"
+	result, err := r.db.Exec(query, input.Title, input.Description, userId, listId)
+	if err != nil {
+		return err
+	}
+
+	if count, _ := result.RowsAffected(); count != 1 {
+		return errors.New("nothing to update")
+	}
+
+	return nil
+}
