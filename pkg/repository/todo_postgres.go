@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
@@ -41,4 +42,25 @@ func (r *TodoPostgres) CreateList(userId int, list todo.TodoList) (int, error) {
 	}
 
 	return listId, tx.Commit()
+}
+func (r *TodoPostgres) GetAllLists(userId int) ([]todo.TodoList, error) {
+	var todoLists []todo.TodoList
+	query := fmt.Sprintf("SELECT tl.*  FROM %s tl INNER JOIN %s ul"+
+		" on tl.id = ul.list_id where ul.user_id=$1", todoListsTable, usersListsTable)
+	err := r.db.Select(&todoLists, query, userId)
+
+	return todoLists, err
+}
+
+func (r *TodoPostgres) GetListById(userId int, listId int) (todo.TodoList, error) {
+	var todoList todo.TodoList
+	query := fmt.Sprintf("SELECT tl.*  FROM %s tl INNER JOIN %s ul"+
+		" on tl.id = ul.list_id where ul.user_id=$1 and tl.id=$2", todoListsTable, usersListsTable)
+	err := r.db.Get(&todoList, query, userId, listId)
+
+	if err != nil {
+		err = errors.New(fmt.Sprintf("no such list with id %d", listId))
+	}
+
+	return todoList, err
 }

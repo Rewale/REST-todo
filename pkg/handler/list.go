@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	todo "go-todo"
 	"net/http"
+	"strconv"
 )
 
 func (h *Handler) createList(c *gin.Context) {
@@ -30,12 +31,43 @@ func (h *Handler) createList(c *gin.Context) {
 
 }
 
+type getAllListsResponse struct {
+	Data []todo.TodoList `json:"data"`
+}
+
 func (h *Handler) getAllLists(c *gin.Context) {
+	userId, err := getUserId(c)
+	if err != nil {
+		return
+	}
+
+	lists, err := h.service.TodoList.GetAllLists(userId)
+	if err != nil {
+		NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(200, getAllListsResponse{
+		Data: lists,
+	})
 
 }
 
 func (h *Handler) getListById(c *gin.Context) {
+	userId, err := getUserId(c)
+	if err != nil {
+		return
+	}
 
+	id, err := strconv.Atoi(c.Param("id"))
+
+	list, err := h.service.TodoList.GetListById(userId, id)
+	if err != nil {
+		NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(200, list)
 }
 
 func (h *Handler) updateList(c *gin.Context) {
