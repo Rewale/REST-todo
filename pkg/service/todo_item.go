@@ -10,7 +10,22 @@ type TodoItemService struct {
 	repoItem repository.TodoItem
 }
 
-func (t TodoItemService) CreateItem(userId int, listId int, input todo.CreateTodoInput) (int, error) {
+// TODO: decorator
+
+func (t *TodoItemService) GetAllItems(userId int, listId int) ([]todo.TodoItem, error) {
+	_, err := t.repoList.GetListById(userId, listId)
+	if err != nil {
+		return nil, err
+	}
+	todos, err := t.repoItem.GetAllTodo(listId)
+	if err != nil {
+		return nil, err
+	}
+
+	return todos, nil
+}
+
+func (t *TodoItemService) CreateItem(userId int, listId int, input todo.CreateTodoInput) (int, error) {
 	_, err := t.repoList.GetListById(userId, listId)
 	if err != nil {
 		return 0, err
