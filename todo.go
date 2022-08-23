@@ -47,10 +47,11 @@ type CreateTodoInput struct {
 type UpdateTodoInput struct {
 	Title       *string `json:"title"`
 	Description *string `json:"description"`
+	Done        *bool   `json:"done"`
 }
 
 func (u UpdateTodoInput) Validate() error {
-	if u.Title == nil && u.Description == nil {
+	if u.Title == nil && u.Description == nil && u.Done == nil {
 		return errors.New("empty update struct fields")
 	}
 	return nil

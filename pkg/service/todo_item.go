@@ -30,6 +30,11 @@ func (t *TodoItemService) UpdateItem(userId int, listId int, itemId int, input t
 		return err
 	}
 
+	err = input.Validate()
+	if err != nil {
+		return err
+	}
+
 	err = t.repoItem.UpdateTodo(itemId, listId, input)
 	if err != nil {
 		return err

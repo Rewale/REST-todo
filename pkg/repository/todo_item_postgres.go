@@ -93,6 +93,11 @@ func (r *TodoPostgresItem) UpdateTodo(todoId int, listId int, input todo.UpdateT
 		args = append(args, *input.Description)
 		argId++
 	}
+	if input.Done != nil {
+		setValues = append(setValues, fmt.Sprintf("done=$%d", argId))
+		args = append(args, *input.Done)
+		argId++
+	}
 	setQuery := strings.Join(setValues, ", ")
 
 	query := "UPDATE todo_items as tl SET " + setQuery + fmt.Sprintf(" Where id=$%d", argId)
