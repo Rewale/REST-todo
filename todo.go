@@ -38,3 +38,20 @@ func (u UpdateListInput) Validate() error {
 	}
 	return nil
 }
+
+type CreateTodoInput struct {
+	Title       string `json:"title" binding:"required"`
+	Description string `json:"description" binding:"required"`
+}
+
+type UpdateTodoInput struct {
+	Title       *string `json:"title"`
+	Description *string `json:"description"`
+}
+
+func (u UpdateTodoInput) Validate() error {
+	if u.Title == nil && u.Description == nil {
+		return errors.New("empty update struct fields")
+	}
+	return nil
+}
