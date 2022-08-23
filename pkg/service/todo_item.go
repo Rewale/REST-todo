@@ -10,6 +10,17 @@ type TodoItemService struct {
 	repoItem repository.TodoItem
 }
 
+func (t *TodoItemService) GetItemById(userId int, listId int, itemId int) (*todo.TodoItem, error) {
+	_, err := t.repoList.GetListById(userId, listId)
+	if err != nil {
+		return nil, err
+	}
+
+	todoItem, err := t.repoItem.GetById(listId, itemId)
+
+	return &todoItem, err
+}
+
 // TODO: decorator
 
 func (t *TodoItemService) GetAllItems(userId int, listId int) ([]todo.TodoItem, error) {

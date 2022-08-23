@@ -59,6 +59,10 @@ func (r *TodoPostgresItem) GetById(listId, todoId int) (todo.TodoItem, error) {
 		"WHERE li.list_id = $1 and ti.id=$2"
 	err := r.db.Get(&todoItem, query, listId, todoId)
 
+	if err != nil {
+		err = errors.New(fmt.Sprintf("no such item with id %d", todoId))
+	}
+
 	return todoItem, err
 
 }
