@@ -66,9 +66,9 @@ func (r *TodoPostgresItem) GetById(listId, todoId int) (todo.TodoItem, error) {
 	return todoItem, err
 
 }
-func (r *TodoPostgresItem) DeleteTodo(todoId int) error {
-	query := "DELETE FROM todo_items WHERE id=$1"
-	result, err := r.db.Exec(query, todoId)
+func (r *TodoPostgresItem) DeleteTodo(todoId int, listId int) error {
+	query := "DELETE FROM todo_items ti USING lists_items li  WHERE ti.id=$1 and li.item_id=$1 and li.list_id=$2 "
+	result, err := r.db.Exec(query, todoId, listId)
 	if err != nil {
 		return err
 	}
@@ -77,7 +77,7 @@ func (r *TodoPostgresItem) DeleteTodo(todoId int) error {
 	}
 	return nil
 }
-func (r *TodoPostgresItem) UpdateTodo(todoId int, input todo.UpdateTodoInput) error {
+func (r *TodoPostgresItem) UpdateTodo(todoId int, listId int, input todo.UpdateTodoInput) error {
 	setValues := make([]string, 0)
 	args := make([]any, 0)
 	argId := 1

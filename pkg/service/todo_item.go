@@ -10,6 +10,33 @@ type TodoItemService struct {
 	repoItem repository.TodoItem
 }
 
+func (t *TodoItemService) DeleteItem(userId int, listId int, itemId int) error {
+	_, err := t.repoList.GetListById(userId, listId)
+	if err != nil {
+		return err
+	}
+
+	err = t.repoItem.DeleteTodo(itemId, listId)
+	if err != nil {
+		return err
+	}
+
+	return nil
+
+}
+func (t *TodoItemService) UpdateItem(userId int, listId int, itemId int, input todo.UpdateTodoInput) error {
+	_, err := t.repoList.GetListById(userId, listId)
+	if err != nil {
+		return err
+	}
+
+	err = t.repoItem.UpdateTodo(itemId, listId, input)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
 func (t *TodoItemService) GetItemById(userId int, listId int, itemId int) (*todo.TodoItem, error) {
 	_, err := t.repoList.GetListById(userId, listId)
 	if err != nil {
