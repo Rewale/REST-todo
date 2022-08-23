@@ -66,6 +66,9 @@ func (r *TodoPostgresItem) GetById(listId, todoId int) (todo.TodoItem, error) {
 	return todoItem, err
 
 }
+
+// TODO: Переписать запросы
+
 func (r *TodoPostgresItem) DeleteTodo(todoId int, listId int) error {
 	query := "DELETE FROM todo_items ti USING lists_items li  WHERE ti.id=$1 and li.item_id=$1 and li.list_id=$2 "
 	result, err := r.db.Exec(query, todoId, listId)
