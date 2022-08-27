@@ -10,7 +10,7 @@ import (
 func (h *Handler) singUp(c *gin.Context) {
 	var input todo.User
 	if err := c.BindJSON(&input); err != nil {
-		NewErrorResponse(c, http.StatusUnprocessableEntity, err.Error())
+		NewErrorResponse(c, http.StatusUnprocessableEntity, "invalid input body")
 		return
 	}
 
