@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  todo-app:
+    build: .
+    command: ./hello
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - DB_PASSWORD=admin
+  db:
+    image: "postgres:latest"
+    volumes:
+      - ./.database/postgres/data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=admin
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  migrate:
+    image: migrate/migrate
+    volumes:
+      - ./schema:/migrations
+    command: ["-path", "/migrations", "-database",
+              "postgres://postgres:admin@db:5432/postgres?sslmode=disable", "up"]
+    depends_on:
+      db:
+        condition: service_healthy
