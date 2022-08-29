@@ -2,6 +2,7 @@ package handler
 
 import (
 	"bytes"
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/magiconair/properties/assert"
@@ -44,6 +45,20 @@ func TestHandler_signUp(t *testing.T) {
 			},
 			expectedStatusCode:  400,
 			expectedRequestBody: `{"message":"invalid input body"}`,
+		},
+		{
+			name:      "Service failed",
+			inputBody: `{"name": "Test","username":"test", "password":"test"}`,
+			inputUser: todo.User{
+				Name:     "Test",
+				Username: "test",
+				Password: "test",
+			},
+			mockBehavior: func(s *mock_service.MockAuthorization, user todo.User) {
+				s.EXPECT().CreateUser(user).Return(1, errors.New("service failure"))
+			},
+			expectedStatusCode:  500,
+			expectedRequestBody: `{"message":"service failure"}`,
 		},
 	}
 
